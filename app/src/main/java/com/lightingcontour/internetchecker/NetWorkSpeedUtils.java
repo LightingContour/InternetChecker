@@ -26,13 +26,6 @@ public class NetWorkSpeedUtils {
         this.mHandler = mHandler;
     }
 
-    TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-            showNetSpeed();
-        }
-    };
-
     public void endShowNetSpeed()
     {
         timer.cancel();
@@ -41,7 +34,17 @@ public class NetWorkSpeedUtils {
     public void startShowNetSpeed(){
         lastTotalRxBytes = getTotalRxBytes();
         lastTimeStamp = System.currentTimeMillis();
-        timer.schedule(task, 1000, 1000); // 1s后启动任务，每2s执行一次
+        //防止timer已被endShowNetSpeed cancel掉.
+        if (timer != null)
+        {
+            timer = new Timer();
+        }
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                showNetSpeed();
+            }
+        }, 0, 1000); // 0s后启动任务，每1s执行一次
     }
 
     private long getTotalRxBytes() {
